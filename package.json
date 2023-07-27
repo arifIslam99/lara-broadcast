@@ -14,5 +14,14 @@
         "pusher-js": "^8.3.0",
         "sass": "^1.56.1",
         "vite": "^4.0.0"
+    },
+    "dependencies": {
+        "@vitejs/plugin-vue": "^4.2.3",
+        "admin-lte": "3.2",
+        "jquery": "^3.7.0",
+        "vee-validate": "^4.10.8",
+        "vue": "^3.3.4",
+        "vue-router": "^4.2.4",
+        "yup": "^1.2.0"
     }
 }

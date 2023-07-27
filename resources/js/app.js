@@ -3,6 +3,29 @@ import '../css/app.css';
 import '../sass/app.scss';
 import * as bootstrap from 'bootstrap';
 
+import 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js';
+// import 'admin-lte/plugins/datatables/jquery.dataTables.min.js';
+// import 'admin-lte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js';
+// import 'admin-lte/plugins/datatables-responsive/js/dataTables.responsive.min.js';
+// import 'admin-lte/plugins/datatables-responsive/js/responsive.bootstrap4.min.js';
+// import 'admin-lte/plugins/datatables-buttons/js/dataTables.buttons.min.js';
+// import 'admin-lte/plugins/datatables-buttons/js/buttons.bootstrap4.min.js';
+import 'admin-lte/dist/js/adminlte.min.js';
+
+import { createApp } from 'vue/dist/vue.esm-bundler.js';
+import { createRouter, createWebHistory } from 'vue-router';
+import Routes from './routes.js';
+
+const app = createApp({});
+
+const router = createRouter({
+    routes: Routes,
+    history: createWebHistory()
+});
+
+app.use(router);
+app.mount('#app');
+
 $(document).ready(function(){
     $(document).on('click', '#send_message',function(e){
         e.preventDefault();
@@ -29,6 +52,12 @@ $(document).ready(function(){
             }
         });
     });
+    // $("#example1").DataTable({
+    //     "responsive": true,
+    //     "lengthChange": false,
+    //     "autoWidth": false,
+    //     "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+    //   }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
 });
 // var user = '';
 window.Echo.channel('chat')

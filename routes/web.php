@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\ApplicationController;
 use Illuminate\Http\Request;
 
 /*
@@ -13,6 +15,17 @@ use Illuminate\Http\Request;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('/api/users', [AdminUserController::class, 'index']);
+
+Route::post('/api/users',[AdminUserController::class, 'store']);
+
+Route::put('/api/users/{user}',[AdminUserController::class, 'update']);
+
+Route::get('{view}', ApplicationController::class)->where('view','(.*)');
+
+// Route::get('/admin/dashboard', function(){
+//     return view('dashboard');
+// });
 
 Route::get('/', function () {
     return view('welcome');
@@ -31,4 +44,4 @@ Route::post('send-message', function(Request $request){
 
 use App\Http\Controllers\UserController;
 
-Route::get('birthday-wish',[UserController:: class,'index']);
+// Route::get('birthday-wish',[UserController:: class,'index']);
