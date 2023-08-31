@@ -1,6 +1,6 @@
 import Dashboard from './components/Dashboard.vue';
 import ListProducts from './pages/products/ListProducts.vue';
-import ListUsers from './pages/users/ListUsers.vue';
+import UserList from './pages/users/UserList.vue';
 export default[
     {
         path: '/admin/dashboard',
@@ -15,6 +15,6 @@ export default[
     {
         path: '/admin/users',
         name: 'admin.users',
-        component: ListUsers
+        component: UserList
     }
 ]

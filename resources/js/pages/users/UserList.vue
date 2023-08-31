@@ -1,13 +1,24 @@
 <script setup>
 import axios from 'axios';
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 import { Form, Field } from 'vee-validate';
 import * as yup from 'yup';
+import { useToastr } from '../../toastr.js';
+// import moment from 'moment';
 
-    const users = ref([]);
+import UserListItem from './UserListItem.vue';
+
+import { debounce } from 'lodash';
+
+import { Bootstrap4Pagination } from 'laravel-vue-pagination';
+
+
+    const toastr = useToastr();
+    const users = ref({'data':[]});
     const editing = ref(false);
     const formValues = ref();
     const form = ref(null);
+   
 
     // const form = reactive({
     //     name: '',
@@ -15,8 +26,8 @@ import * as yup from 'yup';
     //     password: '',
     // });
 
-    const getUsers = () => {
-        axios.get('/api/users')
+    const getUsers = (page = 1) => {
+        axios.get(`/api/users?page=${page}`)
         .then((response) => {
             users.value = response.data;
         })
@@ -43,6 +54,7 @@ import * as yup from 'yup';
         .then((response)=>{
             users.value.unshift(response.data);
             $('#newUser').modal('hide');
+            toastr.success("User successfully created!");
             resetForm();
         })
         .catch((error) => {
@@ -75,6 +87,7 @@ import * as yup from 'yup';
             const index = users.value.findIndex(user => user.id === response.data.id);
             users.value[index] = response.data;
             $('#newUser').modal('hide');
+            toastr.success("User successfully updated!");
         }).catch((error) => {
             setErrors(error.response.data.errors);
             console.log();
@@ -88,8 +101,33 @@ import * as yup from 'yup';
         }
     }
 
+    const userDeleted = (userId) => {
+        users.value = users.value.filter(user => user.id !== userId);
+    }
+
+    const searchQuery = ref(null);
+
+    const search =()=>{
+        axios.get('/api/users/search', {
+            params: {
+                query: searchQuery.value
+            }
+        })
+        .then(response => {
+            users.value = response.data;
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
+
+    watch(searchQuery, debounce(()=>{
+        search();
+    }, 300));
+
     onMounted(()=>{
         getUsers();
+        // toastr.info('Success');
     });
 
     // const createUser = () => {
@@ -137,12 +175,17 @@ import * as yup from 'yup';
         <div class="container-fluid">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Users List</h3>
-                <button @click="addUser" type="button" class="btn btn-primary btn-sm float-right">
-                    <ion-icon name="add-circle-outline"></ion-icon> New user
-                </button>
+                    <!-- <h3 class="card-title">Users List</h3> -->
+                    <div class="d-flex justify-content-between">
+                        <button @click="addUser" type="button" class="btn btn-primary btn-sm float-right">
+                            <ion-icon name="add-circle-outline"></ion-icon> New user
+                        </button>
+                        <div>
+                            <input type="text" v-model="searchQuery" class="form-control" placeholder="Search..."/>
+                        <!-- <button @click.prevent="search">submit</button> -->
+                        </div>
+                    </div>
                 </div>
-                <!-- /.card-header -->
                 <div class="card-body">
                     <table id="example1" class="table table-bordered table-striped">
                         <thead>
@@ -150,21 +193,32 @@ import * as yup from 'yup';
                                 <th>SL</th>
                                 <th>Name</th>
                                 <th>Email</th>
+                                <th>Created</th>
+                                <th>Role</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr v-for="(user, index) in users" :key="user.id">
-                                <td>{{ index + 1 }}</td>
-                                <td>{{ user.name }}</td>
-                                <td>{{ user.email }}</td>
-                                <td>
-                                    <a href="#" @click.prevent="editUser(user)"><i class="fa fa-edit"></i></a>
-                                </td>
+                        <tbody v-if="users.data.length > 0">
+                            <UserListItem v-for="(user, index) in users.data"
+                                :key="user.id"
+                                :user=user
+                                :index = index
+                                @edit-user = "editUser"
+                                @user-deleted = "userDeleted"
+                             />
+                        </tbody>
+                        <tbody v-else>
+                            <tr>
+                                <td colspan="6" class="text-center">No result found..</td>
                             </tr>
                         </tbody>
                     </table>
+                        
                 </div>
+                <Bootstrap4Pagination
+                        :data="users"
+                        @pagination-change-page="getUsers"
+                        />
             </div>
         </div>
     </div>
@@ -207,8 +261,7 @@ import * as yup from 'yup';
             </div>
             </Form>
           </div>
-          <!-- /.modal-content -->
         </div>
-        <!-- /.modal-dialog -->
       </div>
+    
 </template>

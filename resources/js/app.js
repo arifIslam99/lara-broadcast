@@ -4,6 +4,8 @@ import '../sass/app.scss';
 import * as bootstrap from 'bootstrap';
 
 import 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js';
+// import 'admin-lte/plugins/bs-custom-file-input/bs-custom-file-input.min.js';
+import 'admin-lte/plugins/summernote/summernote-bs4.min.js';
 // import 'admin-lte/plugins/datatables/jquery.dataTables.min.js';
 // import 'admin-lte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js';
 // import 'admin-lte/plugins/datatables-responsive/js/dataTables.responsive.min.js';
@@ -27,6 +29,9 @@ app.use(router);
 app.mount('#app');
 
 $(document).ready(function(){
+    $('#summernote').summernote();
+    // bsCustomFileInput.init();
+
     $(document).on('click', '#send_message',function(e){
         e.preventDefault();
         let username=$('#username').val();

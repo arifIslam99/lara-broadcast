@@ -19,7 +19,13 @@ Route::get('/api/users', [AdminUserController::class, 'index']);
 
 Route::post('/api/users',[AdminUserController::class, 'store']);
 
+Route::get('/api/users/search', [AdminUserController::class, 'search']);
+
 Route::put('/api/users/{user}',[AdminUserController::class, 'update']);
+
+Route::patch('/api/users/{user}/change-role', [AdminUserController::class, 'changeRole']);
+
+Route::delete('api/users/{user}', [AdminUserController::class, 'destory']); 
 
 Route::get('{view}', ApplicationController::class)->where('view','(.*)');
 
