@@ -7,6 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Admin | Fuji Optics</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js" integrity="sha512-U2WE1ktpMTuRBPoCFDzomoIorbOyUv0sP8B+INA3EzNAhehbzED1rOJg6bCqPf/Tuposxb5ja/MAUnC8THSbLQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.css" integrity="sha512-7uSoC3grlnRktCWoO4LjHMjotq8gf9XDFQerPuaph+cqR7JC9XKGdvN+UwZMC14aAaBDItdRj3DcSDs4kMWUgg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" integrity="sha512-vKMx8UnXk60zUwyUnUPM3HbQo8QfmNx7+ltw8Pm5zLusl1XIfwcxo8DbWCqMGKaWeNxWA8yrx5v3SaVpMvR3CA==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -222,7 +225,58 @@
         </aside>
 
         <div class="content-wrapper">
-            <router-view></router-view>
+            <div class="content">
+                <div class="container-fluid">
+                    <div class="card">
+                        <form method="POST" action="{{ route('product.store') }}" name="form-create" id="form-create" enctype="multipart/form-data">
+                            @csrf
+                        <div class="card-header">
+                                <h3 class="card-title">Create New Product</h3>
+                                <button type="button" class="btn btn-primary btn-sm float-right">
+                                    <ion-icon name="add-circle-outline"></ion-icon> New Product
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="product_name">Product Title</label>
+                                            <input type="text" name="product_name" id="product_name" class="form-control" placeholder="Product Title">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="price">Product Price</label>
+                                            <input type="text" name="price" id="price" class="form-control" placeholder="Product Price">
+                                        </div>  
+                                    </div>
+                                    <div class="col-md-7">
+                                        <textarea id="summernote" name="product_details">
+                                            
+                                        </textarea>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="exampleInputFile">Fiture Photo</label>
+                                            <input type="file" class="form-control">
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="needsclick dropzone" id="document-dropzone">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                            <button type="submit" id="submit-all" class="btn btn-primary btn-sm fw-bold text-uppercase mt-2">
+                                Save
+                            </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
 
 
@@ -245,6 +299,120 @@
             reserved.
         </footer>
     </div>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+    
+    <!-- @if(Session::has('message')) -->
+
+    <!-- <script>
+        toastr.options = {
+            "progressBar" : true,
+            "closeButton" : true
+        }
+        toastr.success("{{ Session::get('message') }}");
+    </script> -->
+
+    <!-- @endif -->
+    <script type="text/javascript">
+      
+        var uploadedDocumentMap = {}        
+        var minFiles = 1; // minimum file must be to upload
+        var maxFiles = 10; // maximum file allows to upload
+        var myDropzone = Dropzone.options.documentDropzone = {
+            url: "{{ route('uploads') }}",
+            minFiles: minFiles,
+            maxFiles: maxFiles,
+            autoProcessQueue: true,
+            maxFilesize: 5, // MB
+            addRemoveLinks: true,
+            acceptedFiles: ".jpeg,.jpg,.png",
+            timeout: 5000,
+            headers: {
+                'X-CSRF-TOKEN': "{{ csrf_token() }}"
+            },
+            renameFile: function(file) {
+                var dt = new Date();
+                var time = dt.getTime();
+               return time+file.name;
+            },
+            success: function(file, response) {
+                console.log('success file');
+                console.log(file);
+                console.log(response);
+                $('form').append('<input type="hidden" name="document[]" value="' + response.name + '">')
+                uploadedDocumentMap[file.name] = response.name
+            },
+            removedfile: function(file) {
+                console.log('remove file');
+                console.log(file);                                
+                // remove uploaded file from table and storage folder starts
+                var filename = ''
+                if (file.hasOwnProperty('upload')) {
+                    filename = file.upload.filename;
+                }else{
+                    filename = file.name;
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ url('image/delete') }}",
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                    },
+                    data: {
+                        filename: filename,                        
+                    },
+                    sucess: function(data) {
+                        console.log('removed success: ' + data);
+                    }
+                });
+
+                // remove file name from uploadedDocumentMap object
+                Reflect.deleteProperty(uploadedDocumentMap, file.name);
+                
+                file.previewElement.remove();
+                // remove uploaded file from table and storage folder ends
+                // additional delete from multiple hidden files
+                $('form').find('input[name="document[]"][value="' + filename + '"]').remove()
+            },
+            maxfilesexceeded: function(file) {
+                //this.removeAllFiles();
+                //this.addFile(file);
+                //myDropZone.removeFile(file);
+            },
+            init: function() {
+                console.log('init calls');
+                // maxfiles files limit upload validation starts
+                this.on("maxfilesexceeded", function(file) { // Maximum file upload validations                   
+                    alert("Maximum " + maxFiles + " files are allowed to upload...!");
+                    return false;
+                });
+                // maximum files limit upload validation ends
+                
+                // minimum files limit upload validation starts
+                var submitButton = document.querySelector("#submit-all");
+                myDropzone = this;
+                submitButton.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    var imagelength = Object.keys(uploadedDocumentMap).length;
+                    if(imagelength < minFiles ){
+                        alert("Minimum "+minFiles+" file needs to upload...!");
+                        return false;
+                    }else{
+                        $('#form-create').submit();
+                    }
+                });
+                // minimum files limit upload validation ends
+            },
+            error: function(file, response) {
+                console.log('error file')
+                console.log(file)
+                console.log(response)
+                $(file.previewElement).remove(); // removed files if validation fails
+                return false;
+            }
+        }
+        // toastr.success("User successfully updated!");
+    </script>
+    
 </body>
 
 </html>

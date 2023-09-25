@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\ApplicationController;
 use Illuminate\Http\Request;
 
@@ -27,7 +28,7 @@ Route::patch('/api/users/{user}/change-role', [AdminUserController::class, 'chan
 
 Route::delete('api/users/{user}', [AdminUserController::class, 'destory']); 
 
-Route::get('{view}', ApplicationController::class)->where('view','(.*)');
+// Route::get('{view}', ApplicationController::class)->where('view','(.*)');
 
 // Route::get('/admin/dashboard', function(){
 //     return view('dashboard');
@@ -37,6 +38,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/product/create',[ProductController::class, 'index'])->name('product.create');
+Route::post('/product/store',[ProductController::class, 'store'])->name('product.store');
+Route::post('uploads', [ProductController::class,'uploads'])->name('uploads');
+Route::post('image/delete',[ProductController::class,'fileDestroy']);
 use App\Events\PUsherBroadcast;
 
 Route::get('/chat',function(){
@@ -50,4 +55,4 @@ Route::post('send-message', function(Request $request){
 
 use App\Http\Controllers\UserController;
 
-// Route::get('birthday-wish',[UserController:: class,'index']);
+Route::get('birthday-wish',[UserController:: class,'index']);
