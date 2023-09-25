@@ -34,9 +34,10 @@ Route::delete('api/users/{user}', [AdminUserController::class, 'destory']);
 //     return view('dashboard');
 // });
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+Route::get('/', [ProductController::class, 'index'])->name('product.create');
 
 Route::get('/product/create',[ProductController::class, 'index'])->name('product.create');
 Route::post('/product/store',[ProductController::class, 'store'])->name('product.store');

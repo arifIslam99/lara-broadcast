@@ -410,7 +410,6 @@
                 return false;
             }
         }
-        // toastr.success("User successfully updated!");
     </script>
     
 </body>
